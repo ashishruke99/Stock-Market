@@ -10,3 +10,5 @@ tensorflow
 sklearn
 scikit-learn
 sklearn
+Pandas
+jinja2
