@@ -1,3 +1,8 @@
 ### dependency
 streamlit
-
+matplotlib
+pandas_datareader
+yfinance
+keras
+plotly
+datetime
