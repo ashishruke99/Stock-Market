@@ -6,3 +6,4 @@ yfinance
 keras
 plotly
 datetime
+tensorflow
