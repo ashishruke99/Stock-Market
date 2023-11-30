@@ -290,7 +290,7 @@ fig = go.Figure(data=[go.Candlestick(x=result_df.index,
 st.plotly_chart(fig)
 
 # Display the styled DataFrame using Streamlit
-st.write(styled_result_df)
+st.write(result_df)
 
 
 fig3= plt.figure(figsize=(12,6))
