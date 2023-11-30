@@ -281,29 +281,6 @@ k['PercentageChange'] = (k['DailyChange'] / k['Close'].shift(1)) * 100
 k['PercentageChange'] = k['PercentageChange'].map("{:.2f}%".format)
 result_df = pd.concat([h, g, f, k], axis=1)
 
-
-def color_negative_red(value):
-    if value < 0:
-        return 'color: red'
-    elif value > 0:
-        return 'color: green'
-    else:
-        return 'color: black'  # Assuming black for zero change
-
-# Apply conditional formatting to font color based on PercentageChange
-def color_negative_red_percent(value):
-    if '%' in value:  # Check if the value contains a percentage sign
-        value = float(value.replace('%', ''))  # Remove percentage sign and convert to float
-        if value < 0:
-            return 'color: red'
-        elif value > 0:
-            return 'color: green'
-        else:
-            return 'color: black'  # Assuming black for zero change
-
-styled_result_df = result_df.style.applymap(color_negative_red, subset=['DailyChange']) \
-                                  .applymap(color_negative_red_percent, subset=['PercentageChange'])
-
 fig = go.Figure(data=[go.Candlestick(x=result_df.index,
                 open=result_df['Open'],
                 high=result_df['High'],
