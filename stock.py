@@ -6,9 +6,13 @@ import yfinance as yf
 from keras.models import load_model
 import streamlit as st
 import plotly.graph_objs as go
+import datetime
 
+# Set the background image using HTML and CSS
+
+today = datetime.date.today()
 start = '2010-01-01'
-end = '2023-11-1'
+end = today.strftime('%Y-%m-%d')
 
 st.title("Predictive Analysis of Stock Market Trends:           ")
 
@@ -17,42 +21,49 @@ df = yf.download(user_input, start=start, end=end)
 
 st.subheader("Data from 2010 to 2023")
 data1 = pd.DataFrame(df)
-st.dataframe(data1.tail())
 
-st.subheader("Closing Price VS Time Chart")
-fig= plt.figure(figsize=(18,12))
+st.dataframe(data1.tail(15))
+
+
+#Closing price with month and year using moving average
+fig_all = plt.figure(figsize=(18, 12))
 plt.plot(df.Close)
-st.pyplot(fig)
 
-st.subheader("Closing Price VS Time Chart with 30 days")
 ma30 = df.Close.rolling(30).mean()
-fig= plt.figure(figsize=(12,6))
-plt.plot(df.Close)
+fig_ma30 = plt.figure(figsize=(12, 6))
 plt.plot(ma30)
-st.pyplot(fig)
 
-st.subheader("Closing Price VS Time Chart with 365 days")
-ma30 = df.Close.rolling(30).mean()
 ma365 = df.Close.rolling(365).mean()
-fig= plt.figure(figsize=(12,6))
-plt.plot(df.Close)
-plt.plot(ma30)
+fig_ma365 = plt.figure(figsize=(12, 6))
 plt.plot(ma365)
-st.pyplot(fig)
 
-#Splitting Data into Training and Testing
+button_container = st.columns(3)
+
+# Create buttons for each plot
+if button_container[0].button("Show Closing Prices"):
+    st.subheader("Closing Price VS Time Chart")
+    st.pyplot(fig_all)
+
+if button_container[1].button("Show MA30"):
+    st.subheader("Closing Price of 30 days")
+    st.pyplot(fig_ma30)
+
+if button_container[2].button("Show MA365"):
+    st.subheader("Closing Price of 365 days")
+    st.pyplot(fig_ma365)
+#load my model
+model=load_model("keras model.h5")
+
+
+#Splitting Data into Training and Testing using MinMaxScaler
 
 data_training = pd.DataFrame(df['Close'][0: int(len(df)*0.70)])
 data_testing= pd.DataFrame(df['Close'][int(len(df)*0.70): int(len(df))])
-
-
 from sklearn.preprocessing import MinMaxScaler
 scaler = MinMaxScaler(feature_range=(0,1))
 data_training_array= scaler.fit_transform(data_training)
 data_testing_array= scaler.fit_transform(data_testing)
 
-#load my model
-model=load_model("keras model.h5")
 
 past_100_days = data_training.tail(100)
 final_df = past_100_days._append(data_testing, ignore_index=True)
@@ -66,7 +77,7 @@ for i in range(100, input_data.shape[0]):
     x_test.append(input_data[i-100: i])
     y_test.append(input_data[i, 0])
 
-x_test , y_test =np.array(x_test) , np.array(y_test)
+x_test , y_test =np.array(x_test) , np.array(y_test);
 
 #predication making
 test_predication = model.predict(x_test)
@@ -264,11 +275,45 @@ f = pd.DataFrame(arr_open, columns=['Open'])
 k =pd.DataFrame(arr, columns=['Close'])
 
 
+
 k['DailyChange'] = k['Close'].diff()
 k['PercentageChange'] = (k['DailyChange'] / k['Close'].shift(1)) * 100
 k['PercentageChange'] = k['PercentageChange'].map("{:.2f}%".format)
 result_df = pd.concat([h, g, f, k], axis=1)
-st.write(result_df)
+
+
+def color_negative_red(value):
+    if value < 0:
+        return 'color: red'
+    elif value > 0:
+        return 'color: green'
+    else:
+        return 'color: black'  # Assuming black for zero change
+
+# Apply conditional formatting to font color based on PercentageChange
+def color_negative_red_percent(value):
+    if '%' in value:  # Check if the value contains a percentage sign
+        value = float(value.replace('%', ''))  # Remove percentage sign and convert to float
+        if value < 0:
+            return 'color: red'
+        elif value > 0:
+            return 'color: green'
+        else:
+            return 'color: black'  # Assuming black for zero change
+
+styled_result_df = result_df.style.applymap(color_negative_red, subset=['DailyChange']) \
+                                  .applymap(color_negative_red_percent, subset=['PercentageChange'])
+
+fig = go.Figure(data=[go.Candlestick(x=result_df.index,
+                open=result_df['Open'],
+                high=result_df['High'],
+                low=result_df['Low'],
+                close=result_df['Close'])])
+
+st.plotly_chart(fig)
+
+# Display the styled DataFrame using Streamlit
+st.write(styled_result_df)
 
 
 fig3= plt.figure(figsize=(12,6))
@@ -276,7 +321,7 @@ plt.plot(k.Close)
 st.pyplot(fig3)
 
 
-st.title("Next 5 Years Returns and Recommendation")
+st.title("Next 5 Years Returns")
 
 # Input for the stock symbol
 symbol = user_input
@@ -292,13 +337,14 @@ if st.session_state.stock_symbol is not None:
 
         # Display the returns
         st.write(f"{symbol} returns over the next 5 years: {returns_next_5_years:.2f}%")
-
-        # Add recommendation rating
+        st.write("Recommendation Moodel")
         if returns_next_5_years >= 0:
-            st.write("Recommendation: Yes")
+            st.markdown('<div style="padding: 10px; color: white; background-color: green; text-align: center;">Yes</div>', unsafe_allow_html=True)
         else:
-            st.write("Recommendation: No")
+            st.markdown('<div style="padding: 10px; color: white; background-color: red; text-align: center;">No</div>', unsafe_allow_html=True)
 
     except Exception as e:
         st.write(f"Error: {str(e)}")
+
+    
 
