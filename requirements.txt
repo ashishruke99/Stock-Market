@@ -1,7 +1,7 @@
 ### dependency
 streamlit
-pandas_datareader
 matplotlib
+pandas_datareader
 yfinance
 keras
 plotly
