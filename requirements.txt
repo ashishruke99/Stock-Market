@@ -1,6 +1,7 @@
 ### dependency
 streamlit
 matplotlib
+pyplot
 pandas_datareader
 yfinance
 keras
