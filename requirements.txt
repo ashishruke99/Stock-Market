@@ -12,5 +12,6 @@ scikit-learn
 sklearn
 Pandas
 jinja2
+matplotlib
 
 
