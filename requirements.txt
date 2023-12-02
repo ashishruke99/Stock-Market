@@ -1,6 +1,7 @@
 ### dependency
-streamlit
 tensorflow
+streamlit
+
 
 
 
