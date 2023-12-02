@@ -1,6 +1,19 @@
 ### dependency
 tensorflow
 streamlit
+tensorflow	
+sklearn	
+scikit-learn	
+sklearn	
+Pandas	
+jinja2	
+keras
+datetime
+matplotlib
+pyplot
+pandas_datareader
+yfinance
+keras
 
 
 
