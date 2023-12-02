@@ -1,5 +1,4 @@
 ### dependency
-tensorflow
 streamlit
 tensorflow	
 sklearn	
