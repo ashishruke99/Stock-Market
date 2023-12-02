@@ -6,12 +6,5 @@ yfinance
 keras
 plotly
 datetime
-tensorflow
-sklearn
-scikit-learn
-sklearn
-Pandas
-jinja2
-
 
 
